@@ -79,3 +79,10 @@
 4. **Secondary Incidents (403, Timeout, Schema Drift):** 捨棄實作，僅專注於主打的 Session Collision。
 5. **進階沙盒隔離限制:** 放棄實作 Antigravity 的嚴格 Network/FS 沙盒，信任本地執行環境。
 6. **多 Incident 並發處理 (Concurrency):** 今晚只求跑通單一事件，不處理複雜的 Session Lock 與排隊。
+
+---
+## 深夜執行後記（7/31 01:50，Claude orchestrator 補記）
+- ✅ Checklist 1-10 全數達成（run INC-SESSION-COLLISION-20260730T164850Z：REJECT→補查→ACCEPT→RESOLVED，13 events，reveal ✅ MATCH，55 秒）
+- Investigator 最終實作：ADK LlmAgent + 3 個確定性 FunctionTools（http_get/post_message/read_lab_file，ground truth 在 tool 層 denylist）。agy CLI 版因權限模型不適合 subprocess 呼叫而放棄；此設計反而更貼合「工具是 code、判斷是 agent」的講題主張。
+- 🔥 超出預期：GEAP Managed Agents API 實際可用——已在 leapcore-dev/global 建立 Antigravity agent（agents/4056420002016788480, base_agent=antigravity-preview-05-2026, GET 200）。Interactions 端點路徑尚未摸清（POST .../interactions 404），列後續 spike。
+- Demo 產出：runs/INC-.../incident-replay.mp4（67 秒，雙欄 replay，真實 events.jsonl 驅動）
