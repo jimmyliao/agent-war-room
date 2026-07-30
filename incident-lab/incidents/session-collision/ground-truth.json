@@ -1,0 +1,34 @@
+{
+  "incident_id": "session-collision",
+  "title": "Chat context leaks across threads for the same user",
+  "fault": {
+    "mode": "session_collision",
+    "component": "chat-session gateway",
+    "symptom": "A reply in one thread contains context submitted in another thread."
+  },
+  "root_cause": {
+    "summary": "The faulty session-key function uses only user_id.",
+    "mechanism": "Requests from the same user but different channel or thread scopes resolve to one shared in-memory context.",
+    "correct_behavior": "Build the session key from user_id, channel_id, and thread_id."
+  },
+  "expected_diagnosis": [
+    "Identify cross-thread context contamination rather than a client rendering issue.",
+    "Correlate requests from one user across distinct thread_id values.",
+    "Determine that the faulty session key omits channel_id and thread_id.",
+    "Recommend a composite session key scoped by user, channel, and thread."
+  ],
+  "expected_evidence": [
+    {
+      "source": "reproduction",
+      "observation": "The response to thread-beta contains the marker previously sent only to thread-alpha."
+    },
+    {
+      "source": "service logs",
+      "observation": "Requests with different thread_id values are assigned the same session_key while session_collision is active."
+    },
+    {
+      "source": "control comparison",
+      "observation": "In normal mode, the same request sequence keeps each thread context isolated."
+    }
+  ]
+}

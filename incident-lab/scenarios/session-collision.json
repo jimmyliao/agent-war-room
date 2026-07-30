@@ -1,0 +1,23 @@
+{
+  "schema": "agent-war-room.incident.v1",
+  "id": "session-collision",
+  "title": "Cross-thread context leakage",
+  "difficulty": "medium",
+  "visibleSymptoms": [
+    "The same user's unrelated Discord threads receive mixed context."
+  ],
+  "allowedEvidence": [
+    "sanitized request logs",
+    "session mapper source",
+    "session identifiers",
+    "controlled reproduction script"
+  ],
+  "groundTruth": {
+    "category": "session_mapping",
+    "rootCause": "The session key contains user_id but omits channel_id and thread_id.",
+    "requiredProof": [
+      "Two different thread IDs resolve to the same session ID before the fix.",
+      "The threads resolve to different session IDs after the fix."
+    ]
+  }
+}

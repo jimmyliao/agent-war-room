@@ -1,0 +1,13 @@
+{
+  "name": "agent-war-room",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test experiments/event-projector/*.test.js",
+    "demo": "node experiments/event-projector/demo.js"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

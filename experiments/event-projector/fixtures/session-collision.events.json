@@ -1,0 +1,83 @@
+[
+  {
+    "visibility": "public",
+    "incidentId": "INC-003",
+    "sessionId": "discord:channel-1:thread-9:user-4",
+    "eventId": "evt-1",
+    "timestamp": "2026-07-24T13:00:00Z",
+    "agent": "incident_commander",
+    "type": "incident.started",
+    "summary": "Cross-thread context leakage investigation started.",
+    "progress": 5
+  },
+  {
+    "visibility": "trace_only",
+    "incidentId": "INC-003",
+    "sessionId": "discord:channel-1:thread-9:user-4",
+    "eventId": "evt-private",
+    "timestamp": "2026-07-24T13:00:01Z",
+    "agent": "triage",
+    "type": "model.private_reasoning",
+    "summary": "This must never reach Discord.",
+    "chain_of_thought": "private"
+  },
+  {
+    "visibility": "public",
+    "incidentId": "INC-003",
+    "sessionId": "discord:channel-1:thread-9:user-4",
+    "eventId": "evt-2",
+    "timestamp": "2026-07-24T13:00:03Z",
+    "agent": "triage",
+    "type": "agent.delegated",
+    "summary": "Session, routing, and memory evidence requested.",
+    "progress": 20
+  },
+  {
+    "visibility": "public",
+    "incidentId": "INC-003",
+    "sessionId": "discord:channel-1:thread-9:user-4",
+    "eventId": "evt-3",
+    "timestamp": "2026-07-24T13:00:12Z",
+    "agent": "antigravity_investigator",
+    "type": "evidence.found",
+    "summary": "The session key currently contains user_id only.",
+    "progress": 50,
+    "evidence": {
+      "path": "session_mapper.py:47",
+      "credentials": "fixture-secret"
+    }
+  },
+  {
+    "visibility": "public",
+    "incidentId": "INC-003",
+    "sessionId": "discord:channel-1:thread-9:user-4",
+    "eventId": "evt-4",
+    "timestamp": "2026-07-24T13:00:18Z",
+    "agent": "evidence_critic",
+    "type": "review.rejected",
+    "summary": "A controlled two-thread reproduction is still missing.",
+    "progress": 65
+  },
+  {
+    "visibility": "public",
+    "incidentId": "INC-003",
+    "sessionId": "discord:channel-1:thread-9:user-4",
+    "eventId": "evt-5",
+    "timestamp": "2026-07-24T13:00:35Z",
+    "agent": "antigravity_investigator",
+    "type": "evidence.found",
+    "summary": "Two threads reproduce the same shared session identifier.",
+    "progress": 85
+  },
+  {
+    "visibility": "public",
+    "incidentId": "INC-003",
+    "sessionId": "discord:channel-1:thread-9:user-4",
+    "eventId": "evt-6",
+    "timestamp": "2026-07-24T13:00:42Z",
+    "agent": "incident_commander",
+    "type": "incident.resolved",
+    "summary": "Root cause confirmed: channel_id and thread_id are absent from the session key.",
+    "progress": 100
+  }
+]
