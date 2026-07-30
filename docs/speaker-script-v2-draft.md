@@ -97,11 +97,11 @@
 
 **旁白稿（對影片配音用）**：
 1. 「User 在 Discord 報錯說記憶污染，OpenAB 把訊息送給 Commander。Commander 喚醒 Triage Agent，Triage 分析後認為這是 memory 與 routing 的問題。」
-2. 「Commander 把整理好的 brief 交給 Antigravity Investigator，Investigator 開始在沙盒裡翻 code，發現 session key 只用了 user_id。」
-3. 「Investigator 很興奮地提交了第一份診斷，聲稱這就是 root cause。這時候 Evidence Critic 上場了。」
+2. 「Commander 把整理好的 brief 交給 Investigator。它開始用工具翻 code、讀 logs，發現 session key 只用了 user_id。」
+3. 「Investigator 提交了第一份診斷，聲稱這就是 root cause。這時候 Evidence Critic 上場了。」
 4. 「注意 Critic 的決定：REJECT。因為 Investigator 只有靜態分析，缺乏『雙 thread 交叉污染的真實 reproduction 證據』，這只能算猜測。」
-5. 「Commander 收到拒絕後，立刻重派 Investigator 進行第二次調查，並附上 Critic 的要求。」
-6. 「這一次，Investigator 寫了一個 test script，真的跑了兩個 thread 模擬請求，成功重現了 collision。」
+5. 「Commander 收到拒絕後，立刻重派 Investigator 第二輪調查，並附上 Critic 開出的證據清單。」
+6. 「這一次，Investigator 真的用 post_message 對兩個不同 thread 各發一則帶唯一 marker 的訊息——thread B 的回覆裡出現了 thread A 的 marker，collision 被實際重現。」
 7. 「帶著實驗 log，Investigator 再次提交診斷。Critic 檢查證據吻合，終於點頭 ACCEPT。」
 8. 「最後 Commander 宣告確認 Root Cause，準備進入人工修復審核。從猜測到實證，這就是有 critique loop 的威力。」
 
@@ -117,10 +117,11 @@
 ### Slide 18 — Section lead
 🎯 **「接下來我們拆開引擎蓋，看看這是怎麼寫出來的。」**
 
-### Slide 19 — Code：Triage / Critic
-🎯 **「Triage 和 Critic 其實很輕量，它們是 ADK 的 LlmAgent 加上 structured output。而最複雜的 Investigator 呢？我們不是寫一個超大 prompt，而是把它包成一個 tool 呼叫 Antigravity API。」**
+### Slide 19 — Code：Triage / Critic / Investigator
+🎯 **「Triage 和 Critic 很輕量：ADK 的 LlmAgent 加 structured output。Investigator 也不是一個超大 prompt——它是 LlmAgent 配三個『確定性工具』：查健康、發訊息做實驗、讀程式碼。工具是 code，判斷是 agent。」**
 
-- 「讓專門的 managed harness 去做複雜的調查，ADK 專心做判斷。」
+- 「工具裡直接寫死 guardrail：ground truth 檔案在 tool 層就被封鎖，agent 想作弊也讀不到。」
+- 「同一個 Investigator 介面也可以換成 GEAP 的 Antigravity Managed Agent（Preview）——這是 config 的選擇，不是重寫。」
 
 ### Slide 20 — Code：Critique loop 組裝
 🎯 **「這個退回重審的 loop 怎麼寫？用 ADK 的 Sequential 跟 Loop 原語組合。Commander 的邏輯是：只有 Critic 的 status 是 accept 時，才往上 escalate。」**

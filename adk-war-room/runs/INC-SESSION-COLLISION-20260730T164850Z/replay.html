@@ -1,0 +1,93 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Agent War Room — Incident Replay</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Noto Sans CJK TC','gg sans',sans-serif; background:#1e1f22; color:#dbdee1; height:100vh; overflow:hidden; }
+.header { background:#111214; padding:10px 18px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #2b2d31; }
+.header .badge { background:#ED4245; color:#fff; font-weight:700; border-radius:4px; padding:2px 8px; font-size:13px; }
+.header .title { font-weight:700; font-size:15px; }
+.header .sub { color:#949ba4; font-size:12px; margin-left:auto; font-family:monospace; }
+.cols { display:flex; height:calc(100vh - 45px); }
+.left { flex:1.15; background:#313338; overflow-y:auto; padding:14px 16px; }
+.right { flex:1; background:#0d1117; overflow-y:auto; padding:12px 14px; border-left:1px solid #2b2d31; font-family:'DejaVu Sans Mono',monospace; }
+.right h3 { color:#7d8590; font-size:11px; letter-spacing:1px; margin-bottom:8px; position:sticky; top:0; background:#0d1117; padding:4px 0;}
+.msg { display:flex; gap:10px; margin-bottom:12px; opacity:0; transform:translateY(8px); transition:all .4s; }
+.msg.show { opacity:1; transform:none; }
+.avatar { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0; }
+.body .name { font-weight:700; font-size:14px; }
+.body .time { color:#949ba4; font-size:11px; margin-left:6px; }
+.body .text { font-size:13.5px; margin-top:2px; line-height:1.45; white-space:pre-wrap; }
+.tag { display:inline-block; font-size:10.5px; font-weight:700; border-radius:3px; padding:1px 6px; margin-right:6px; vertical-align:1px; color:#fff;}
+.ev { margin-bottom:7px; font-size:11.5px; color:#7d8590; opacity:0; transition:opacity .4s; line-height:1.5; }
+.ev.show { opacity:1; }
+.ev .k { color:#79c0ff; }
+.ev .t { color:#ffa657; }
+.reveal { margin:10px 0; padding:12px; border:2px solid #3BA55D; border-radius:8px; background:#232a25; opacity:0; transition:opacity .6s; }
+.reveal.show { opacity:1; }
+.reveal .row { font-size:13px; margin:3px 0; }
+.reveal .ok { color:#3BA55D; font-weight:800; font-size:16px; }
+</style></head><body>
+<div class="header"><span class="badge">🚨 INCIDENT</span><span class="title">INC-SESSION-COLLISION-20260730T164850Z · cross-thread context contamination</span><span class="sub">ADK × Vertex gemini-3.5-flash · public-event.v1</span></div>
+<div class="cols"><div class="left" id="chat"></div>
+<div class="right"><h3>EXECUTION EVENTS (events.jsonl · 真實記錄)</h3><div id="raw"></div></div></div>
+<script>
+const EVENTS = [
+ {"eventId":"01b2cf43","timestamp":"2026-07-30T16:48:50.286617+00:00","agent":"commander","type":"incident.started","summary":"同一使用者在兩個 Discord threads 的對話內容互相污染","progress":0},
+ {"eventId":"f8178e0a","timestamp":"2026-07-30T16:48:50.286850+00:00","agent":"commander","type":"agent.delegated","summary":"Delegated symptom classification to triage_agent.","progress":10},
+ {"eventId":"6a77dd04","timestamp":"2026-07-30T16:48:59.001438+00:00","agent":"triage_agent","type":"investigation.progress","summary":"Triage brief produced: Discord Thread State Management, Session and Context Isolation Scope, Global or Shared State in Event Handlers","progress":20},
+ {"eventId":"9acda3a8","timestamp":"2026-07-30T16:48:59.001709+00:00","agent":"commander","type":"agent.delegated","summary":"Delegated investigation round 1 to investigator.","progress":25},
+ {"eventId":"c35dcfc0","timestamp":"2026-07-30T16:49:17.886537+00:00","agent":"investigator","type":"evidence.found","summary":"Investigation round 1 returned 2806 characters of evidence.（靜態分析：server.py session key 只用 user_id — 尚未執行 reproduction）","progress":35},
+ {"eventId":"0fd35205","timestamp":"2026-07-30T16:49:17.886834+00:00","agent":"commander","type":"agent.delegated","summary":"Delegated evidence review for round 1.","progress":39},
+ {"eventId":"092c2d21","timestamp":"2026-07-30T16:49:24.537481+00:00","agent":"evidence_critic","type":"review.rejected","summary":"請對 /message 執行受控重現：同一 user_id 與 channel_id，先對 thread-A 發送含獨特標記的訊息，再對 thread-B 發送另一則，完整記錄兩次 POST 的 Payload 與 Response，確認 thread-B 的回覆是否洩漏 thread-A 的標記。目前僅有靜態分析，不足以確立因果。","progress":45},
+ {"eventId":"52f9ccb3","timestamp":"2026-07-30T16:49:24.537696+00:00","agent":"commander","type":"investigation.progress","summary":"State advanced to REINVESTIGATING：需補「雙 thread controlled reproduction」動態證據。","progress":47},
+ {"eventId":"a934d0d9","timestamp":"2026-07-30T16:49:24.537795+00:00","agent":"commander","type":"agent.delegated","summary":"Delegated investigation round 2 to investigator.","progress":50},
+ {"eventId":"5b5f0bcc","timestamp":"2026-07-30T16:49:39.420886+00:00","agent":"investigator","type":"evidence.found","summary":"Investigation round 2 returned 2454 characters of evidence.（post_message 雙 thread 實驗：thread-B 回覆中出現 thread-A 的 marker test-marker-alpha-xyz-987 → 污染重現）","progress":60},
+ {"eventId":"91eb617e","timestamp":"2026-07-30T16:49:39.421151+00:00","agent":"commander","type":"agent.delegated","summary":"Delegated evidence review for round 2.","progress":64},
+ {"eventId":"a56247b7","timestamp":"2026-07-30T16:49:45.325238+00:00","agent":"evidence_critic","type":"review.accepted","summary":"受控重現證據完整：thread-B 的回覆確實洩漏 thread-A 的獨特標記，且報告將行為連結至 server.py 中僅以 user_id 作為 session_key 的具體程式碼根因。證據充足、推論嚴謹，予以接受。","progress":70},
+ {"eventId":"397ae7a5","timestamp":"2026-07-30T16:49:45.325504+00:00","agent":"commander","type":"incident.resolved","summary":"Critic accepted the diagnosis and controlled reproduction evidence.","progress":100}
+];
+const META = {
+ "commander":["🧭","Commander","#5865F2"],
+ "triage_agent":["📋","Triage","#3BA55D"],
+ "investigator":["🔬","Investigator","#FAA61A"],
+ "evidence_critic":["🧪","Evidence Critic","#ED4245"]
+};
+const chat = document.getElementById('chat'), raw = document.getElementById('raw');
+function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function typeTag(t){
+  const m = {'incident.started':['#ED4245','INCIDENT'],'agent.delegated':['#5865F2','DELEGATE'],
+    'investigation.progress':['#6b7280','PROGRESS'],'evidence.found':['#FAA61A','EVIDENCE'],
+    'review.rejected':['#ED4245','REJECTED ✗'],'review.accepted':['#3BA55D','ACCEPTED ✓'],
+    'incident.resolved':['#3BA55D','RESOLVED']};
+  const [c,l] = m[t]||['#6b7280',t];
+  return `<span class="tag" style="background:${c}">${l}</span>`;
+}
+let i = 0;
+function step(){
+  if (i >= EVENTS.length){ setTimeout(finale, 800); return; }
+  const e = EVENTS[i];
+  const [emoji,name,color] = META[e.agent]||['🤖',e.agent,'#949ba4'];
+  const m = document.createElement('div'); m.className='msg';
+  m.innerHTML = `<div class="avatar" style="background:${color}22;border:2px solid ${color}">${emoji}</div>
+    <div class="body"><div><span class="name" style="color:${color}">${name}</span><span class="time">${e.timestamp.slice(11,19)}Z</span></div>
+    <div class="text">${typeTag(e.type)}${esc(e.summary)}</div></div>`;
+  chat.appendChild(m); requestAnimationFrame(()=>m.classList.add('show'));
+  const r = document.createElement('div'); r.className='ev';
+  r.innerHTML = `<span class="k">${e.eventId}</span> <span class="t">${e.type}</span> agent=${e.agent} progress=${e.progress}%`;
+  raw.appendChild(r); requestAnimationFrame(()=>r.classList.add('show'));
+  chat.scrollTop = chat.scrollHeight; raw.scrollTop = raw.scrollHeight;
+  i++;
+  const pause = (e.type.startsWith('review')) ? 4200 : (e.type==='evidence.found' ? 3200 : 1800);
+  setTimeout(step, pause);
+}
+function finale(){
+  const d = document.createElement('div'); d.className='reveal';
+  d.innerHTML = `<div class="row">🔍 <b>/incident reveal</b> — 比對 ground truth（agents 全程不可讀）</div>
+   <div class="row">Injected fault&nbsp;&nbsp;: <code>session_collision</code>（session key 只用 user_id）</div>
+   <div class="row">Agent diagnosis: 僅以 user_id 作為 session_key → 跨 thread context 污染</div>
+   <div class="row ok">RESULT: ✅ MATCH · 1 rejection → controlled reproduction → accepted · 55 秒</div>`;
+  chat.appendChild(d); requestAnimationFrame(()=>d.classList.add('show'));
+  chat.scrollTop = chat.scrollHeight;
+  document.title = 'REPLAY_DONE';
+}
+setTimeout(step, 1200);
+</script></body></html>
