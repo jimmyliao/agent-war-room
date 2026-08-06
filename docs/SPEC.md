@@ -1,9 +1,6 @@
-# Agent War Room — Product, Talk, and Experiment Specification
+# Agent War Room — System and Experiment Specification
 
-Status: Draft v0.2  
-Target event: COSCUP 2026 / GDG Taiwan track  
-Session length: 30 minutes  
-Target date: 2026-08-09  
+Status: Draft v0.3
 Repository: `agent-war-room`
 
 ## 1. Executive summary
@@ -35,25 +32,10 @@ controlled two-thread reproduction. The Commander then starts a bounded second
 investigation. Only after causal evidence exists is the incident marked
 resolved.
 
-## 2. Background
+## 2. Motivation
 
-### 2.1 Original talk direction
-
-The accepted session was originally framed around upgrading a news-digest
-Streamlit MVP into a Next.js and ADK multi-agent application deployed on a
-Google enterprise agent platform.
-
-That framing has three weaknesses for the intended audience:
-
-1. News summarization is now commoditized by many OSS and commercial tools.
-2. A four-stage digest can look like a fixed workflow disguised as four agents.
-3. A successful final answer does not demonstrate production readiness,
-   orchestration, observability, or recovery.
-
-### 2.2 Revised direction
-
-The revised talk uses debugging because students and early-career engineers
-frequently face:
+Debugging is used as the driving scenario because students and early-career
+engineers frequently face:
 
 - unfamiliar repositories;
 - deployment failures that work locally;
@@ -71,35 +53,11 @@ Debugging naturally exposes the difference between:
 - human approval;
 - runtime observability.
 
-### 2.3 Audience
+A successful final answer alone does not demonstrate production readiness,
+orchestration, observability, or recovery. This project is designed so those
+properties are visible and verifiable rather than assumed.
 
-Primary audience:
-
-- students;
-- recent graduates;
-- junior engineers;
-- developers interested in Google technologies;
-- developers who have tried LLM APIs but have limited production agent
-  experience.
-
-Assumed knowledge:
-
-- basic API and Git concepts;
-- basic understanding of cloud deployment;
-- no prior ADK, Antigravity, GEAP, ACP, A2A, or MCP experience required.
-
-Audience priorities:
-
-- a relatable engineering problem;
-- real code rather than product slogans;
-- a reproducible repository;
-- clear decisions they can reuse in side projects;
-- visible proof that multiple agents actually collaborated;
-- honest limitations, cost, latency, and failure behavior.
-
-## 3. Talk thesis and learning outcomes
-
-### 3.1 Thesis
+## 3. Design thesis
 
 > Multi-agent expertise is not how many bots appear on screen. It is knowing
 > where to place deterministic logic, autonomy, responsibility boundaries, and
@@ -111,21 +69,6 @@ Supporting statement:
 > coordinates work. Antigravity handles open-ended autonomous investigation.
 > GEAP determines where the system runs, preserves state, and becomes
 > observable.
-
-### 3.2 Key takeaways
-
-After 30 minutes, the audience should be able to:
-
-1. Distinguish a function/tool, workflow, agent, multi-agent system, and
-   multiple visible bots.
-2. Explain the responsibilities of OpenAB, ADK, Antigravity, and GEAP without
-   treating them as interchangeable products.
-3. Recognize conditional routing, parallel fan-out, critique loops, bounded
-   retry, and human-in-the-loop approval.
-4. Decide whether an open-ended task needs custom ADK orchestration, an
-   Antigravity autonomous agent, or a hybrid.
-5. Use structured events, traces, and ground truth to verify agent behavior
-   instead of judging a polished final response.
 
 ## 4. Terminology and decision framework
 
@@ -227,9 +170,8 @@ ADK owns application-level orchestration:
 - human approval checkpoints;
 - structured public events.
 
-ADK is selected instead of hand-written orchestration because the talk needs to
-show an explicit, testable agent application rather than scattered prompts and
-`if/else` logic.
+ADK is selected instead of hand-written orchestration to provide an explicit,
+testable agent application rather than scattered prompts and `if/else` logic.
 
 ### 5.3 Antigravity
 
@@ -261,7 +203,7 @@ GEAP provides two complementary execution paths:
 2. Antigravity managed-code autonomy through Managed Agents API and
    Interactions API.
 
-Responsibilities demonstrated in the talk:
+Responsibilities demonstrated:
 
 - remote managed execution;
 - sessions and interaction continuity;
@@ -270,8 +212,8 @@ Responsibilities demonstrated in the talk:
 - trace, log, latency, and tool-call observability;
 - separation between development framework and managed runtime.
 
-The talk must state that Managed Agents API and the Antigravity base agent are
-Preview/Pre-GA and are used only with synthetic, non-sensitive data.
+Managed Agents API and the Antigravity base agent are Preview/Pre-GA and are
+used only with synthetic, non-sensitive data.
 
 ### 5.5 Case-specific adapter
 
@@ -598,8 +540,7 @@ behavior.
 
 ## 11. Secondary incidents
 
-Secondary incidents are summarized in the talk and may be implemented after the
-primary scenario.
+Secondary incidents may be implemented after the primary scenario.
 
 ### 11.1 Permission denied
 
@@ -809,9 +750,9 @@ Requirements:
 
 ## 15. Observability and proof
 
-The talk must prove the agents actually executed.
+The system must prove the agents actually executed.
 
-Evidence shown:
+Evidence available:
 
 - GEAP execution trace;
 - ADK event `author`;
@@ -823,7 +764,7 @@ Evidence shown:
 - number of tool/model calls;
 - final ground-truth comparison.
 
-The recorded demo should show:
+A recorded replay should show:
 
 ```text
 Discord timeline | GEAP execution trace
@@ -858,9 +799,7 @@ The evaluator compares:
 
 Ground truth is isolated from the Investigator runtime.
 
-### 16.3 Minimum dataset
-
-COSCUP version:
+### 16.3 Reference dataset
 
 - one fully implemented primary incident;
 - two secondary incident definitions;
@@ -878,7 +817,7 @@ single Antigravity autonomous agent
 ```
 
 Compare correctness, latency, cost, implementation effort, transparency, and
-recovery behavior. This is future work, not required for the first talk demo.
+recovery behavior. This is future work.
 
 ## 17. Security and safety
 
@@ -914,114 +853,29 @@ Any mutation requires:
 
 ### 17.4 Preview disclosure
 
-Managed Agents API and the Antigravity preview base agent must be labeled
-Preview/Pre-GA. The talk must not recommend them for sensitive or commercial
-production workloads in their current preview state.
+Managed Agents API and the Antigravity preview base agent are Preview/Pre-GA.
+They must not be recommended for sensitive or commercial production workloads in
+their current preview state.
 
-## 18. Recorded-demo production
+## 18. Repository and publication
 
-### 18.1 Why recorded
-
-The session may be remote or prerecorded. The technical value must not depend
-on live network reliability.
-
-### 18.2 Canonical video
-
-Target length: 6–7 minutes.
-
-Scenes:
-
-1. Show two Discord threads leaking context.
-2. Start the incident.
-3. Show Triage structured output.
-4. Show parallel/read-only evidence collection.
-5. Show the first Antigravity diagnosis.
-6. Show Critic rejection.
-7. Show controlled reproduction.
-8. Show accepted diagnosis and ground-truth match.
-9. Show GEAP trace.
-10. Show fixed behavior and isolated sessions.
-
-### 18.3 Editing rules
-
-- real cloud execution, not fabricated UI;
-- waiting time may be shortened;
-- show actual total runtime;
-- retain unedited recording;
-- retain machine-readable event log;
-- no credentials or private reasoning;
-- clearly label simulated incident data.
-
-## 19. Thirty-minute talk outline
-
-### 00:00–03:00 — A familiar bug
-
-- Show cross-thread context leakage.
-- Ask whether four bots would make this multi-agent.
-- State the thesis.
-
-### 03:00–07:00 — Tool, workflow, agent, multi-agent
-
-- Introduce the decision framework.
-- Explain why a fixed four-stage pipeline is not enough.
-
-### 07:00–11:00 — Responsibility architecture
-
-- OpenAB, ADK, Antigravity, and GEAP.
-- Introduce Commander, Triage, Investigator, and Critic.
-
-### 11:00–18:00 — Recorded incident replay
-
-- Execute the full session-collision narrative.
-- Highlight conditional routing, evidence, rejection, and re-investigation.
-
-### 18:00–22:00 — Implementation
-
-- ADK orchestration and stopping conditions.
-- Antigravity skill/sandbox.
-- public-event projector.
-
-### 22:00–26:00 — Verification
-
-- GEAP trace and events.
-- latency/tool-call data.
-- second session isolation.
-
-### 26:00–29:00 — Trade-offs
-
-- why not one autonomous agent;
-- why not make everything an agent;
-- Preview and production boundaries.
-
-### 29:00–30:00 — Takeaways
-
-- repeat the five learning outcomes;
-- repository and reproduction path.
-
-## 20. Repository and publication plan
-
-### 20.1 Repository
-
-Independent repository:
+### 18.1 Repository structure
 
 ```text
 agent-war-room/
-├── incident-lab/
-├── adk-war-room/
-├── antigravity-agent/
-├── openab-adapter/
-├── skills/
-├── experiments/
-├── evals/
-├── infra/
-├── docs/
-└── talk/
+├── incident-lab/         Reproducible fault scenarios and ground truth
+├── adk-war-room/         ADK orchestration application
+├── antigravity-agent/    Managed Agent configuration and debugging skill
+├── openab-adapter/       Case-specific ACP/Discord integration
+├── skills/               Reusable debugging skill
+├── experiments/          Executable technical spikes
+└── docs/                 Specification and architecture
 ```
 
 OpenAB remains an external OSS dependency and reference deployment. Its source
 is not copied into this repository.
 
-### 20.2 Public material
+### 18.2 Public material
 
 - architecture and sequence diagrams;
 - teaching-oriented ADK orchestration;
@@ -1030,10 +884,9 @@ is not copied into this repository.
 - debugging skill;
 - synthetic Incident Lab;
 - evaluation rubric;
-- sanitized deployment examples;
-- slides and recordings.
+- sanitized deployment examples.
 
-### 20.3 Private material
+### 18.3 Private material (never published)
 
 - customer data;
 - real incident traces;
@@ -1044,15 +897,13 @@ is not copied into this repository.
 - customer connectors;
 - production-only skills and datasets.
 
-### 20.4 Licensing
-
-Planned:
+### 18.4 Licensing
 
 - code and reusable examples: Apache-2.0;
-- slides, diagrams, and written talk material: CC BY 4.0;
+- written documentation and diagrams: CC BY 4.0;
 - third-party assets: retain and cite original licenses.
 
-## 21. Functional requirements
+## 19. Functional requirements
 
 ### FR-1 Incident creation
 
@@ -1102,7 +953,7 @@ Pause before any mutating action.
 
 Restore the Incident Lab to a known state.
 
-## 22. Non-functional requirements
+## 20. Non-functional requirements
 
 ### NFR-1 Reproducibility
 
@@ -1129,22 +980,19 @@ Public summaries must reference evidence without exposing private reasoning.
 The repository must provide a fixture-backed local learning path even when a
 user lacks GEAP Preview access.
 
-### NFR-7 Demo reliability
+### NFR-7 Reproducible evidence
 
-A canonical edited recording, unedited recording, and machine-readable event
-log must exist before the talk.
+A machine-readable event log and an isolated ground-truth comparison must exist
+for the primary incident.
 
-## 23. Implementation milestones
+## 21. Implementation milestones
 
 ### M0 — Specification and event projector
 
 - formal specification;
-- talk outline;
 - event schema;
 - redaction and allowlist tests;
 - session-collision fixture.
-
-Status: started.
 
 ### M1 — Local incident and orchestration
 
@@ -1179,17 +1027,16 @@ Status: started.
 - approval round trip;
 - attachment/artifact delivery.
 
-### M5 — Evaluation and recording
+### M5 — Evaluation
 
 - primary incident end-to-end evaluation;
 - secondary incident summaries;
 - metrics table;
-- canonical and unedited videos;
-- final slides and repository instructions.
+- repository instructions.
 
-## 24. Acceptance criteria
+## 22. Acceptance criteria
 
-The COSCUP build is accepted when:
+The reference build is accepted when:
 
 1. A user can initiate the primary incident from Discord or replay the same
    event fixture locally.
@@ -1205,9 +1052,8 @@ The COSCUP build is accepted when:
 9. GEAP trace proves the execution path.
 10. Two incident sessions remain isolated.
 11. All repository tests pass.
-12. The demo can be understood from the recording without live narration.
 
-## 25. Risks and mitigations
+## 23. Risks and mitigations
 
 ### Antigravity Preview access or API changes
 
@@ -1234,7 +1080,7 @@ Mitigation:
 - show trace authors and tool evidence;
 - compare with hidden ground truth.
 
-### Demo appears to be a fixed sequential workflow
+### System appears to be a fixed sequential workflow
 
 Mitigation:
 
@@ -1242,40 +1088,3 @@ Mitigation:
 - use independent evidence branches;
 - include a critique/re-plan loop;
 - demonstrate another isolated session.
-
-### Too many technologies for 30 minutes
-
-Mitigation:
-
-- one incident;
-- one architecture sentence per technology;
-- code only for orchestration, skill, and event projector;
-- move deployment details to the repository.
-
-### No Python/GCP tooling in the current workspace
-
-Mitigation:
-
-- keep protocol/event experiments executable with Node initially;
-- provision a Python and gcloud-capable environment before M1/M2;
-- keep local fixture tests independent of cloud credentials.
-
-### Remote GitHub repository cannot be created
-
-Mitigation:
-
-- maintain a complete local Git repository;
-- create remote only after authenticated owner selection.
-
-## 26. Open questions
-
-1. Final GitHub owner: personal account or organization?
-2. Is Managed Agents API Preview enabled in the selected GCP project?
-3. Which region/project will host Agent Runtime?
-4. Does the talk title need to preserve the accepted wording on the COSCUP
-   schedule?
-5. Will the public reference adapter use ACP streaming directly or an
-   intermediate HTTP service?
-6. How much of the infrastructure should be Terraform versus documented CLI?
-7. Should remediation remain entirely simulated in the first release?
-
