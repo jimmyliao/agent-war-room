@@ -292,7 +292,8 @@ Responsibilities:
 - route based on suspected domains;
 - select deterministic or autonomous work;
 - start independent evidence tasks in parallel;
-- enforce a maximum of two investigation rounds;
+- enforce a bounded number of investigation rounds (default three, i.e. the
+  Critic may reject up to twice before a terminal decision);
 - ask the user for missing information;
 - request approval before mutation;
 - end as resolved, inconclusive, rejected, or failed.
@@ -454,7 +455,8 @@ Mutating actions pause:
 
 #### Bounded termination
 
-Maximum autonomous investigation rounds: 2.
+Maximum autonomous investigation rounds: 3 (the Critic may reject up to twice).
+Configurable via `MAX_ITERATIONS`. A clean run typically resolves in 2 rounds.
 
 Terminal states:
 
@@ -931,7 +933,7 @@ Accept or reject the diagnosis using explicit criteria.
 
 ### FR-7 Bounded re-investigation
 
-Allow at most two investigation rounds.
+Allow a bounded number of investigation rounds (default three).
 
 ### FR-8 Public progress
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from dataclasses import dataclass
 from typing import Any
@@ -19,7 +20,9 @@ from .investigator import build_round_prompt, investigator_agent
 
 APP_NAME = "adk_debugging_war_room"
 USER_ID = "war-room-operator"
-MAX_ITERATIONS = 3
+# Bounded critique loop: the Critic may reject up to twice before a terminal
+# decision. Override with MAX_ITERATIONS; a clean run resolves in ~2 rounds.
+MAX_ITERATIONS = int(os.environ.get("MAX_ITERATIONS", "3"))
 
 # ADK-native topology declaration mirrored by the commander's control loop.
 critique_loop = LoopAgent(
