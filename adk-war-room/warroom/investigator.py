@@ -15,7 +15,7 @@ from typing import Any
 
 from google.adk.agents import LlmAgent
 
-LAB_ROOT = Path("/home/jimmyliao/workspace/agent-war-room/incident-lab")
+LAB_ROOT = Path(__file__).resolve().parents[2] / "incident-lab"
 SERVICE_URL = "http://127.0.0.1:8898"
 _DENY_MARKERS = ("ground-truth", "ground_truth", "scenarios")
 

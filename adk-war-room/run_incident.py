@@ -12,9 +12,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 # Vertex configuration must be present before importing/constructing ADK agents.
-os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "1"
-os.environ["GOOGLE_CLOUD_PROJECT"] = "leapcore-dev"
-os.environ["GOOGLE_CLOUD_LOCATION"] = "global"
+# Set GOOGLE_CLOUD_PROJECT in your environment (or a .env) to your own GCP project.
+os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "1")
+os.environ.setdefault("GOOGLE_CLOUD_PROJECT", "your-gcp-project")
+os.environ.setdefault("GOOGLE_CLOUD_LOCATION", "global")
 
 from warroom.commander import new_session_id, run_war_room
 from warroom.events import PublicEventProjector

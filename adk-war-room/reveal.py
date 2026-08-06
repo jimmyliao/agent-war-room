@@ -5,9 +5,9 @@ import sys
 from pathlib import Path
 
 RUNS = Path(__file__).parent / "runs"
-GT = Path(
-    "/home/jimmyliao/workspace/agent-war-room/incident-lab/incidents/"
-    "session-collision/ground-truth.json"
+GT = (
+    Path(__file__).resolve().parents[1]
+    / "incident-lab/incidents/session-collision/ground-truth.json"
 )
 
 

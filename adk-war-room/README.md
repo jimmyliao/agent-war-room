@@ -23,22 +23,23 @@ mode。
 
 - incident-lab 已在 `http://127.0.0.1:8898` 執行。
 - `agy` 位於 `PATH`。
-- 已具備 `leapcore-dev` 的 Vertex AI ADC 權限。
-- 重用 digest-agent venv 中已安裝的 `google-adk`。
+- 已具備你自己 GCP 專案的 Vertex AI ADC 權限（`export GOOGLE_CLOUD_PROJECT=<your-project>`）。
+- 一個已安裝 `google-adk` 的 Python 環境（venv / uv）。
 
 ## 執行
 
-    cd /home/jimmyliao/workspace/personal/projects/digest-agent
-    uv run python /home/jimmyliao/workspace/agent-war-room/adk-war-room/run_incident.py
+以下指令皆從 `adk-war-room/` 目錄執行：
+
+    uv run python run_incident.py
 
 自訂症狀：
 
-    uv run python /home/jimmyliao/workspace/agent-war-room/adk-war-room/run_incident.py \
+    uv run python run_incident.py \
       "同一 user 在不同 thread 看到彼此訊息"
 
 指定 incident ID：
 
-    uv run python /home/jimmyliao/workspace/agent-war-room/adk-war-room/run_incident.py \
+    uv run python run_incident.py \
       --incident-id INC-003
 
 ## 輸出
@@ -49,7 +50,7 @@ Console 應展示：
 
 事件檔位於：
 
-    /home/jimmyliao/workspace/agent-war-room/adk-war-room/runs/<incident_id>/events.jsonl
+    adk-war-room/runs/<incident_id>/events.jsonl
 
 每行皆符合 `agent-war-room.public-event.v1`。Allowed event types：
 `incident.started`, `agent.delegated`, `investigation.progress`, `evidence.found`,
