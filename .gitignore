@@ -4,3 +4,4 @@ incident-lab/logs/
 __pycache__/
 *.pyc
 .venv/
+incident-lab/incidents/*/sample-logs/
