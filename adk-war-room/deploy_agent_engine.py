@@ -41,7 +41,11 @@ app = AdkApp(agent=triage, enable_tracing=True)
 print(">>> deploying to Agent Engine (this builds a container, ~5-10 min)...", flush=True)
 remote = agent_engines.create(
     agent_engine=app,
-    requirements=["google-adk==2.6.2"],
+    requirements=[
+        # AdkApp is pickled by-reference → remote must import vertexai to unpickle
+        "google-cloud-aiplatform[agent_engines]==1.163.0",
+        "google-adk==2.6.2",
+    ],
     display_name="agent-war-room-triage",
     description="COSCUP 2026 Debugging War Room — Triage agent (M3 spike)",
 )
