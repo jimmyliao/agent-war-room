@@ -135,7 +135,13 @@ def main() -> None:
     print(">>> deploying to Agent Engine (builds a container, ~5-10 min)...", flush=True)
     remote = agent_engines.create(
         agent_engine=app,
-        requirements=["google-adk==2.6.2"],
+        requirements=[
+            # remote must import vertexai to unpickle AdkApp
+            "google-cloud-aiplatform[agent_engines]==1.163.0",
+            "google-adk==2.6.2",
+        ],
+        # ship the local warroom package so war_room_pipeline's imports resolve
+        extra_packages=["warroom"],
         display_name="agent-war-room-full",
         description=(
             "COSCUP 2026 Debugging War Room — full pipeline "
