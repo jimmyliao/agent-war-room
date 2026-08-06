@@ -2,6 +2,8 @@
 
 Reference implementation for the COSCUP 2026 talk:
 
+![Debugging War Room demo](adk-war-room/sample-run/demo.gif)
+
 > 四個 Agents 如何一起抓 Bug？GEAP × ADK × Antigravity × OpenAB 實戰
 
 The project demonstrates a visible, verifiable multi-agent incident-response
@@ -45,4 +47,3 @@ runbooks, internal risk policies, or production OpenAB configuration.
 
 - Code and reusable examples: Apache-2.0
 - Talk materials and diagrams: CC BY 4.0
-
