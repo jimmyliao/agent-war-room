@@ -387,12 +387,21 @@ class WarRoomAgent:
     # -- helpers -----------------------------------------------------------
     @staticmethod
     def _extract_text(blocks: list[dict[str, Any]]) -> str:
+        import re
+
         parts = [
             str(b.get("text", ""))
             for b in blocks
             if isinstance(b, dict) and b.get("type") == "text"
         ]
-        return "\n".join(p for p in parts if p).strip()
+        text = "\n".join(p for p in parts if p)
+        # OpenAB prepends a <sender_context>{...}</sender_context> block carrying
+        # the user's Discord id/name/channel ids — strip it so it never reaches
+        # the war room or gets echoed back into the public channel.
+        text = re.sub(
+            r"<sender_context>.*?</sender_context>", "", text, flags=re.DOTALL
+        )
+        return text.strip()
 
 
 def _make_incident_id(symptom: str) -> str:
