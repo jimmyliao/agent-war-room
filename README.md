@@ -32,7 +32,7 @@ adk-war-room/          ADK orchestration application
 antigravity-agent/     Managed Agent configuration and debugging skill
 openab-adapter/        Case-specific ACP/Discord integration
 experiments/           Executable technical spikes
-docs/                  Specification, architecture, and talk plan
+docs/                  Specification and architecture
 ```
 
 ## Publication boundary

@@ -51,5 +51,7 @@ Console 應展示：
 
     /home/jimmyliao/workspace/agent-war-room/adk-war-room/runs/<incident_id>/events.jsonl
 
-每行皆符合 `agent-war-room.public-event.v1`，使用 GAP-TONIGHT.md 定義的 allowed
-event types。
+每行皆符合 `agent-war-room.public-event.v1`。Allowed event types：
+`incident.started`, `agent.delegated`, `investigation.progress`, `evidence.found`,
+`review.accepted`, `review.rejected`, `approval.required`, `incident.resolved`,
+`incident.failed`。
