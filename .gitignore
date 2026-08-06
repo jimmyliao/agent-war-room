@@ -5,3 +5,4 @@ __pycache__/
 *.pyc
 .venv/
 incident-lab/incidents/*/sample-logs/
+adk-war-room/sample-run/replay.html
