@@ -152,9 +152,11 @@ def sanitize_public_event(raw: dict[str, Any]) -> dict[str, Any] | None:
 def format_event_line(event: dict[str, Any]) -> str:
     """One Discord-facing line, matching the console timeline style."""
     emoji = EMOJI.get(event["type"], "•")
+    # Leading blank line separates each event into its own scannable block
+    # (OpenAB concatenates streamed chunks into one Discord message).
     return (
-        f"{emoji} `[{event['progress']:>3}%]` **{event['agent']}** · "
-        f"{event['type']}\n{event['summary']}"
+        f"\n\n{emoji} `[{event['progress']:>3}%]` **{event['agent']}** · "
+        f"`{event['type']}`\n{event['summary']}"
     )
 
 
