@@ -9,6 +9,7 @@ belongs in tools, judgement belongs in agents.
 from __future__ import annotations
 
 import json
+import os
 import urllib.request
 from pathlib import Path
 from typing import Any
@@ -16,7 +17,8 @@ from typing import Any
 from google.adk.agents import LlmAgent
 
 LAB_ROOT = Path(__file__).resolve().parents[2] / "incident-lab"
-SERVICE_URL = "http://127.0.0.1:8898"
+# incident-lab defaults to 127.0.0.1:8899; override with INCIDENT_LAB_URL.
+SERVICE_URL = os.environ.get("INCIDENT_LAB_URL", "http://127.0.0.1:8899")
 _DENY_MARKERS = ("ground-truth", "ground_truth", "scenarios")
 
 

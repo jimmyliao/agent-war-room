@@ -3,34 +3,39 @@
 本機 ADK incident-debugging MVP：
 
 1. `triage_agent` 產出 structured investigation brief。
-2. agy Investigator 執行初步調查。
+2. `investigator`（ADK `LlmAgent` + deterministic FunctionTools）向 incident-lab
+   實際發送請求蒐證。
 3. `critic_agent` 檢查 controlled reproduction 證據。
 4. Reject 時 Commander 進入 `REINVESTIGATING`，最多三輪。
 5. Accept 時推進至 `RESOLVED`。
 6. Public Event Projector 將 v1 events 寫入 `runs/<incident_id>/events.jsonl`，
    並在 console 顯示 timeline。
 
-所有 ADK LLM agent 使用 Vertex AI 上的 `gemini-3.5-flash`。Investigator
-使用本機：
+所有 ADK LLM agent（triage / investigator / critic）都使用 Vertex AI 上的
+`gemini-3.5-flash`。Investigator 的自主性來自 LLM 選擇要呼叫哪個工具；工具本身
+（`http_get` / `post_message` / `read_lab_file`）是純程式碼並有硬性 guardrail。
 
-    agy --model gemini-3.1-pro --effort low --print-timeout 10m -p "<prompt>"
-
-程式不讀取 incident ground truth，且 Investigator prompt 明確禁止存取
-`incidents/*/ground-truth.json`。Investigator 只能 GET `/fault`，不可改變 fault
-mode。
+程式不讀取 incident ground truth，且工具層明確封鎖 `incidents/*/ground-truth.json`
+與 `scenarios/`。Investigator 不可改變 fault mode。
 
 ## 前置條件
 
-- incident-lab 已在 `http://127.0.0.1:8898` 執行。
-- `agy` 位於 `PATH`。
+- incident-lab 已啟動（預設 `http://127.0.0.1:8899`；用 `INCIDENT_LAB_URL` 覆寫）。
 - 已具備你自己 GCP 專案的 Vertex AI ADC 權限（`export GOOGLE_CLOUD_PROJECT=<your-project>`）。
 - 一個已安裝 `google-adk` 的 Python 環境（venv / uv）。
 
-## 執行
+## 安裝與執行
 
 以下指令皆從 `adk-war-room/` 目錄執行：
 
+    uv venv && source .venv/bin/activate
+    uv pip install -r requirements.txt
+    export GOOGLE_CLOUD_PROJECT=<your-project>
     uv run python run_incident.py
+
+若 incident-lab 跑在非預設 port，加：
+
+    export INCIDENT_LAB_URL=http://127.0.0.1:<port>
 
 自訂症狀：
 

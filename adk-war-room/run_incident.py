@@ -6,10 +6,16 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import logging
 import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
+
+# The commander runs each agent in its own Runner, so ADK's runner logs a benign
+# "Event from an unknown agent" warning for every sub-agent event. Mute it — the
+# public event timeline is emitted by our own projector, not this logger.
+logging.getLogger("google_adk.google.adk.runners").setLevel(logging.ERROR)
 
 # Vertex configuration must be present before importing/constructing ADK agents.
 # Set GOOGLE_CLOUD_PROJECT in your environment (or a .env) to your own GCP project.

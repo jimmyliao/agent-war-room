@@ -1,14 +1,6 @@
-.env
-.env.*
-!.env.example
-node_modules/
-dist/
-coverage/
+# transient run artifacts (events.jsonl + logs per incident)
+adk-war-room/runs/
+incident-lab/logs/
 __pycache__/
-.pytest_cache/
-.venv/
 *.pyc
-*.log
-.DS_Store
-terraform.tfstate
-terraform.tfstate.*
+.venv/
