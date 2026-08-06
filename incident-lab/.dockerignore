@@ -1,0 +1,9 @@
+# Keep evaluator ground truth and non-service files out of the image.
+incidents/
+scenarios/
+logs/
+state/
+__pycache__/
+*.pyc
+README.md
+run.sh
