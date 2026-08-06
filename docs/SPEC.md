@@ -1090,3 +1090,56 @@ Mitigation:
 - use independent evidence branches;
 - include a critique/re-plan loop;
 - demonstrate another isolated session.
+
+## 24. Implementation status (2026-08-06)
+
+What is real (verified) vs. roadmap, with the RCAs that unblocked each.
+
+### Real / verified
+- **Local run (L0/L1/L2)** — `npm test`/`demo` (event projector), incident-lab
+  reproduces the collision, `run_incident.py` resolves in 2 rounds via the
+  critique loop. Tagged `v0.1.0`.
+- **GEAP full 4-agent E2E** — `deploy_full_agent_engine.py` deploys
+  `war_room_pipeline` (SequentialAgent: triage → LoopAgent[investigator,
+  critic]) to Vertex Agent Engine (us-central1); investigator's FunctionTools
+  reach the Cloud Run incident-lab and reproduce the collision in the cloud.
+  Tagged `v0.2.0`. See `DEPLOY-M3.md`.
+- **Antigravity investigator** — `antigravity-agent/investigator.py` calls the
+  public Gemini **Interactions API** (`.../v1beta/interactions`, model
+  `antigravity-preview-05-2026`), returning the 8-key diagnosis contract.
+- **Cloud Trace** — `trace_run.py` (OTel exporter); spans verified in console.
+- **OpenAB → Discord** — `openab-adapter/warroom_acp.py` runs as an OpenAB ACP
+  backend, streaming the public-event timeline into Discord (replay verified).
+
+### RCAs (gotchas that blocked deploys)
+1. **Agent Engine "failed to start"** — `requirements` omitted
+   `google-cloud-aiplatform[agent_engines]`; `AdkApp` is pickled by reference so
+   the remote must `import vertexai` to unpickle → `ModuleNotFoundError:
+   vertexai`. Fix: pin it in `requirements`. Also ship the local `warroom`
+   package via `extra_packages`.
+2. **GCS staging 403 on deploy** — ADC `quota_project_id` pointed at a project
+   whose billing account was a closed trial; `x-goog-user-project` mismatch →
+   403. Fix: `gcloud auth application-default set-quota-project <project>`.
+3. **Region/model** — Agent Engine runs in us-central1, which only has the
+   `gemini-2.5` family; the local demo uses `gemini-3.5-flash` (global-only).
+   Deploy recursively rewrites every `LlmAgent.model` to `gemini-2.5-flash`.
+4. **OpenAB backend needs python3** — official openab images have none; build
+   `FROM ghcr.io/openabdev/openab:*-codex` + `apt install python3`.
+5. **OpenAB `<sender_context>` injection** — OpenAB prepends a JSON block with
+   the user's Discord id/name/channel to the prompt; `warroom_acp._extract_text`
+   strips it (privacy + input hygiene). Streamed chunks concatenate into one
+   Discord message, so each event is prefixed with a blank line.
+
+### Roadmap (honest)
+- **Conversational follow-up in Discord** — feasible (~0.5–1 day). The
+  Antigravity agent does **not** support multi-turn (`Multiturn chat is not
+  enabled`); use `gemini-3.5-flash` with `previous_interaction_id` (verified) +
+  the investigator tools for interactive log/code Q&A. Live mode only.
+- **Antigravity via GEAP-Vertex managed runtime** — the Interactions API path
+  already covers this need; the managed path is optional.
+
+### Ops note
+- A borrowed bot ("Max with AGY") temporarily runs warroom-acp for demo
+  recording; **restore by 2026-08-10**: `docker compose down && docker start
+  openab-max-agy` (in `~/workspace/leapcore-cc/deploy-warroom/`). Deployed GEAP
+  reasoning engine + Cloud Run incident-lab bill until torn down.
